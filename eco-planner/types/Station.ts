@@ -3,7 +3,7 @@ interface Station {
     name: string;
     latitude: string;
     longitude: string;
-    price: string;
+    fuels: string;
     brand: string;
     address: string;
     distance: string;
