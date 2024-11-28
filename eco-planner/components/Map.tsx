@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { StyleSheet, View, Text, Button, Platform, Linking, Alert } from 'react-native';
+import { StyleSheet, View, Text, Platform, Linking, Alert } from 'react-native';
 import MapView, { LongPressEvent, Marker } from 'react-native-maps';
 
 const Map: React.FC<MapProps> = ({ userCoords, stationsList, onCoordsChange, selectedStationCoords }) => {

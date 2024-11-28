@@ -27,8 +27,17 @@ const useGasStations = (initialCoords: number[] | null) => {
 
     try {
       const response = await axios.get(
-        `https://api.prix-carburants.2aaz.fr/stations/around/${coords[0]},${coords[1]}?range=5000&responseFields=[Services,Fuels,Price]`
+        `https://api.prix-carburants.2aaz.fr/stations/around/${coords[0]},${coords[1]}`,
+        {
+          headers: {
+            'Range': 'station=1-20'
+          },
+          params: {
+            responseFields: '[Services,Fuels,Price]'
+          }
+        }
       );
+      
 
       const stationsData: Station[] = response.data.map((station: any) => ({
         id: station.id.toString(),
