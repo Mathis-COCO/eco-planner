@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { Text, Button, StyleSheet, FlatList, SafeAreaView } from 'react-native';
+import { Text, Button, StyleSheet, FlatList, SafeAreaView, Pressable } from 'react-native';
 import MapScreen from '@/components/Map';
 import FuelFilters from '@/components/FuelFilters';
 import StationInfos from '@/components/StationInfos';
 import useLocation from '@/hooks/useLocation';
 import useGasStations from '@/hooks/useGasStations';
+import Entypo from '@expo/vector-icons/Entypo';
 
 const GasStationsScreen: React.FC = () => {
   const { coords: userCoords, fetchLocation } = useLocation();
   const { filteredStations, fetchGasPrices, selectedFuelType, setSelectedFuelType } = useGasStations(userCoords);
   const [selectedCoords, setSelectedCoords] = useState<number[]>([]);
-  const [listHeight, setListHeight] = useState(200); // Hauteur initiale de la FlatList
+  const [listHeight, setListHeight] = useState<number>(100);
 
   useEffect(() => {
     fetchLocation();
@@ -35,7 +36,7 @@ const GasStationsScreen: React.FC = () => {
   };
 
   const toggleListHeight = () => {
-    setListHeight(prevHeight => (prevHeight === -200 ? 0 : -200));
+    setListHeight(prevHeight => (prevHeight === 100 ? 0 : 100));
   };
 
   return (
@@ -57,9 +58,11 @@ const GasStationsScreen: React.FC = () => {
 
       {filteredStations.length > 0 && (
         <>
-          <Button title="voir plus (ou moins ^^)" onPress={toggleListHeight} />
+          <Pressable onPress={toggleListHeight} style={styles.swapHeigth}>
+            <Entypo name="dots-three-horizontal" size={24} color="black" />
+          </Pressable>
           <FlatList
-            style={[styles.listContainer, { height: listHeight }]}
+            style={[styles.listContainer, { height: `${listHeight}%` }]}
             data={filteredStations}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
@@ -87,6 +90,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 16,
     textAlign: 'center',
+  },
+  swapHeigth: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 0,
   },
   listContainer: {
     borderWidth: 1,

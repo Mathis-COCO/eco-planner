@@ -35,7 +35,7 @@ export default function HomeScreen() {
       headerImage={
         <Image
           source={require('@/assets/images/gas_pumps.jpg')}
-          style={styles.reactLogo}
+          style={styles.gasPumpImage}
         />
       }>
       <ThemedView style={styles.titleContainer}>
@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
   searchBarInputText: {
     fontSize: 16,
   },
-  reactLogo: {
+  gasPumpImage: {
     height: '100%',
     width: '100%',
     bottom: 0,

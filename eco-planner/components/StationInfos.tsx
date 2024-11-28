@@ -2,6 +2,7 @@ import React from 'react';
 import { TouchableOpacity } from 'react-native';
 import { StyleSheet, View } from 'react-native';
 import { Text } from 'react-native';
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 
 interface TempProps {
     station: Station;
