@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Alert } from 'react-native';
 
-const useGasStations = (initialCoords: number[] | null) => {
+const useGasStations = (chosenRange: number) => {
   const [stations, setStations] = useState<Station[]>([]);
   const [filteredStations, setFilteredStations] = useState<Station[]>([]);
   const [selectedFuelType, setSelectedFuelType] = useState<string>('Tous');
@@ -13,7 +13,8 @@ const useGasStations = (initialCoords: number[] | null) => {
     } else {
       const filtered = stations.filter((station) =>
         Array.isArray(station.fuels) &&
-        station.fuels.some((fuel) => fuel.short_name === selectedFuelType)
+        station.fuels.some((fuel) => fuel.short_name === selectedFuelType) &&
+        station.distance < chosenRange
       );
       setFilteredStations(filtered);
     }
@@ -47,7 +48,8 @@ const useGasStations = (initialCoords: number[] | null) => {
         fuels: station.Fuels,
         brand: station.Brand.name,
         address: `${station.Address.street_line}, ${station.Address.city_line}`,
-        distance: station.Distance.text,
+        distance: station.Distance.value,
+        distanceText: station.Distance.text,
       }));
 
       setStations(stationsData);

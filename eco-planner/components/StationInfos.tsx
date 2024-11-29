@@ -2,7 +2,6 @@ import React from 'react';
 import { TouchableOpacity } from 'react-native';
 import { StyleSheet, View } from 'react-native';
 import { Text } from 'react-native';
-import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 
 interface TempProps {
     station: Station;
@@ -14,7 +13,7 @@ const StationInfos: React.FC<TempProps> = ({ station, selectedFuelType, onPress 
         <TouchableOpacity onPress={onPress}>
             <View style={styles.stationItem}>
                 <Text style={styles.stationName}>{station.name}</Text>
-                <Text>Distance : {station.distance}</Text>
+                <Text>Distance : {station.distanceText}</Text>
                     {Array.isArray(station.fuels) && station.fuels.map((fuel, index) => (
                     fuel.short_name === selectedFuelType ? 
                     <View style={styles.fuelPricesContainer} key={index}>

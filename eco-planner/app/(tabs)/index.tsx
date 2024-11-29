@@ -44,7 +44,7 @@ export default function HomeScreen() {
       <ThemedView style={styles.searchBarContainer}>
         <SearchBar
           placeholder="Rechercher un véhicule..."
-          value={inputText}  // Utilise inputText pour la recherche en temps réel
+          value={inputText}
           onChangeText={handleTextChange}
           containerStyle={styles.searchBarContainerStyle}
           inputContainerStyle={styles.searchBarInput}

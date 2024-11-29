@@ -24,16 +24,16 @@ const SliderComponent: React.FC<SliderComponentProps> = ({
       step={1}
       allowTouchTrack
       style={styles.slider}
-      trackStyle={{ height: 5, backgroundColor: 'transparent' }}
-      thumbStyle={{ height: 20, width: 20, backgroundColor: 'transparent' }}
+      trackStyle={{ height: 3, backgroundColor: 'transparent' }}
+      thumbStyle={{ height: 15, width: 15, backgroundColor: 'transparent' }}
       thumbProps={{
         children: (
           <Icon
             name="crosshairs"
             type="font-awesome"
-            size={20}
+            size={15}
             reverse
-            containerStyle={{ bottom: 20, right: 20 }}
+            containerStyle={{ bottom: 15, right: 15 }}
             color={'#2b64cf'}
           />
         ),

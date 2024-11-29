@@ -1,12 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { StyleSheet, View, Text, Platform, Linking, Alert } from 'react-native';
-import MapView, { LongPressEvent, Marker } from 'react-native-maps';
+import MapView, { Circle, LongPressEvent, Marker } from 'react-native-maps';
 
 const Map: React.FC<MapProps> = ({ userCoords, stationsList, onCoordsChange, selectedStationCoords, chosenRange }) => {
     const [userMapCoords, setUserMapCoords] = useState<number[]>(userCoords);
     const mapRef = useRef<MapView | null>(null);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+    console.log(chosenRange)
     useEffect(() => {
         console.log('click')
         if (selectedStationCoords && selectedStationCoords.length === 2) {
@@ -81,21 +82,29 @@ const Map: React.FC<MapProps> = ({ userCoords, stationsList, onCoordsChange, sel
             </Marker>
 
             {stationsList.map((coord, index) => (
-            <Marker
-                // key={coord.id}
-                coordinate={{
-                latitude: +coord.latitude,
-                longitude: +coord.longitude,
-                }}
-                title={coord.name}
-                description={coord.distance}
-                onPress={() => animateToMarker([+coord.latitude, +coord.longitude])}
-            >
-                <View style={styles.currentPositionContainer}>
-                    <Text style={styles.currentPosition}>⛽</Text>
-                </View>
-            </Marker>
+                chosenRange > coord.distance && (
+                    <Marker
+                        coordinate={{
+                        latitude: +coord.latitude,
+                        longitude: +coord.longitude,
+                        }}
+                        title={coord.name}
+                        description={coord.distanceText}
+                        onPress={() => animateToMarker([+coord.latitude, +coord.longitude])}
+                    >
+                        <View style={styles.currentPositionContainer}>
+                            <Text style={styles.currentPosition}>⛽</Text>
+                        </View>
+                    </Marker>
+                )
             ))}
+            <Circle
+                center = { { latitude : userMapCoords[0], longitude : userMapCoords[1]} }
+                radius = { chosenRange }
+                strokeWidth = { 1 }
+                strokeColor = { '#1a66ff' }
+                fillColor = { 'rgba(230,238,255,0.5)' }
+            />
         </MapView>
       </View>
     );

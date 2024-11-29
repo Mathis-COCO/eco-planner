@@ -6,6 +6,7 @@ interface Station {
     fuels: string;
     brand: string;
     address: string;
-    distance: string;
+    distance: number;
+    distanceText: string;
   }
   

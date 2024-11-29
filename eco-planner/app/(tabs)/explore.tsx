@@ -1,22 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { Text, Button, StyleSheet, FlatList, SafeAreaView, Pressable } from 'react-native';
+import { Button, StyleSheet, SafeAreaView, View, Text, Pressable } from 'react-native';
 import MapScreen from '@/components/Map';
 import FuelFilters from '@/components/FuelFilters';
-import StationInfos from '@/components/StationInfos';
 import useLocation from '@/hooks/useLocation';
 import useGasStations from '@/hooks/useGasStations';
-import Entypo from '@expo/vector-icons/Entypo';
-import { Icon, Slider } from '@rneui/base';
 import SliderComponent from '@/components/RangeSlider';
+import StationsList from '@/components/StationList';
+import { Icon } from '@rneui/base';
 
 const GasStationsScreen: React.FC = () => {
   const { coords: userCoords, fetchLocation } = useLocation();
-  const { filteredStations, fetchGasPrices, selectedFuelType, setSelectedFuelType } = useGasStations(userCoords);
   const [selectedCoords, setSelectedCoords] = useState<number[]>([]);
-  const [listHeight, setListHeight] = useState<number>(0);
+  const [listHeight, setListHeight] = useState<number>(-1);
   const [chosenRange, setChosenRange] = useState(50);
   const [maxDistance, setMaxDistance] = useState(50);
   const [minDistance, setMinDistance] = useState(0);
+  const [sliderVisibility, setSliderVisibility] = useState(true);
+  const { filteredStations, fetchGasPrices, selectedFuelType, setSelectedFuelType } = useGasStations(chosenRange);
 
   useEffect(() => {
     fetchLocation();
@@ -30,9 +30,9 @@ const GasStationsScreen: React.FC = () => {
 
   useEffect(() => {
     if (filteredStations.length > 0 && filteredStations[filteredStations.length - 1].distance) {
-      setChosenRange(Math.ceil(parseFloat(filteredStations[filteredStations.length - 1].distance.replace(' km', '')))*10)
-      filteredStations[filteredStations.length - 1].distance.includes(' km') ? setMaxDistance(parseFloat(filteredStations[filteredStations.length - 1].distance.replace(' km', '')) * 10) : setMaxDistance(parseFloat(filteredStations[filteredStations.length - 1].distance.replace(' m', '')) / 100) 
-      filteredStations[0].distance.includes(' km') ? setMinDistance(parseFloat(filteredStations[0].distance.replace(' km', '')) * 10) : setMinDistance(parseFloat(filteredStations[0].distance.replace(' m', '')) / 100)
+      setChosenRange(Math.ceil(filteredStations[filteredStations.length - 1].distance));
+      setMaxDistance(Math.ceil(filteredStations[filteredStations.length - 1].distance));
+      setMinDistance(Math.floor(filteredStations[0].distance));
     }
   }, [filteredStations]);
 
@@ -49,63 +49,73 @@ const GasStationsScreen: React.FC = () => {
   };
 
   const toggleListHeight = () => {
-    setListHeight(prevHeight => (prevHeight === 100 ? 0 : prevHeight === 0 ? -1 : 100));
+    setListHeight((prevHeight) => (prevHeight === 100 ? 0 : prevHeight === 0 ? -1 : 100));
   };
 
-  console.log(chosenRange)
+  const toggleSliderVisibility = () => {
+    setSliderVisibility((prev) => !prev);
+  };
+
   return (
-<SafeAreaView style={styles.container}>
-  {userCoords && (
-    <Button title="Rechercher les stations autour de moi" onPress={() => fetchGasPrices(selectedCoords)} />
-  )}
+    <SafeAreaView style={styles.container}>
+      {userCoords && filteredStations.length === 0 ? (
+        <Button
+          title="Rechercher les stations autour de vous"
+          onPress={() => fetchGasPrices(selectedCoords)}
+        />
+      ) : userCoords && filteredStations.length > 0 && listHeight !== 100 && (
+        <Pressable style={[styles.refreshListContainer, {top: sliderVisibility ? '27.5%' : '18%', left: sliderVisibility ? '80%' : '60%'}]} onPress={() => fetchGasPrices(selectedCoords)}>
+          <Icon
+            name="refresh"
+            type="font-awesome"
+            size={13}
+            reverse
+            color={'#2b64cf'}
+          />
+        </Pressable>
+      )}
 
-  <FuelFilters onFuelTypeChange={handleFuelTypeChange} />
-  
-  {filteredStations.length > 0 && (
-    <SliderComponent
-      value={chosenRange}
-      onValueChange={setChosenRange}
-      maximumValue={Math.ceil(maxDistance)}
-      minimumValue={Math.floor(minDistance)}
-    />
-  )}
-  
-  {userCoords && (
-    <MapScreen
-      userCoords={userCoords}
-      stationsList={filteredStations}
-      onCoordsChange={handleUserPositionChange}
-      selectedStationCoords={selectedCoords}
-    />
-  )}
+      {filteredStations.length > 0 && listHeight !== 100 && (
+      <>
+        <View>
+          <FuelFilters onFuelTypeChange={handleFuelTypeChange} />
+        </View>
 
-  {filteredStations.length > 0 && (
-    <>
-      <Pressable onPress={toggleListHeight} style={styles.swapHeigth}>
-        <Entypo name="dots-three-horizontal" size={24} color="black" />
-      </Pressable>
-      {listHeight !== -1 && (
-        <FlatList
-          style={[styles.listContainer, { height: `${listHeight}%` }]}
-          data={filteredStations}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => {
-            if (+item.distance.replace(' km', '') * 10 < chosenRange) {
-              return (
-                <StationInfos
-                  station={item}
-                  selectedFuelType={selectedFuelType}
-                  onPress={() => handleStationSelect([+item.latitude, +item.longitude])}
-                />
-              );
-            }
-            return null;
-          }}
+          <View style={[styles.sliderContainer, { width: sliderVisibility ? '85%' : '25%', left: sliderVisibility ? '7.5%' : '25%' }]}>
+            <Text onPress={toggleSliderVisibility}>{chosenRange}m</Text>
+            {sliderVisibility && (
+              <SliderComponent
+                value={chosenRange}
+                onValueChange={setChosenRange}
+                maximumValue={Math.ceil(maxDistance)}
+                minimumValue={Math.floor(minDistance)}
+              />
+            )}
+          </View>
+        </>
+      )}
+
+      {userCoords && (
+        <MapScreen
+          userCoords={userCoords}
+          stationsList={filteredStations}
+          onCoordsChange={handleUserPositionChange}
+          selectedStationCoords={selectedCoords}
+          chosenRange={chosenRange}
         />
       )}
-    </>
-  )}
-</SafeAreaView>
+
+      {filteredStations.length > 0 && (
+        <StationsList
+          filteredStations={filteredStations}
+          selectedFuelType={selectedFuelType}
+          chosenRange={chosenRange}
+          listHeight={listHeight}
+          toggleListHeight={toggleListHeight}
+          onStationSelect={handleStationSelect}
+        />
+      )}
+    </SafeAreaView>
   );
 };
 
@@ -116,23 +126,31 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     marginBottom: '21%',
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  swapHeigth: {
+  refreshListContainer: {
+    position: 'absolute',
+    left: '80%',
+    backgroundColor: 'white',
+    zIndex: 1,
+    height: 45,
+    width: 45,
+    borderRadius: 100,
     display: 'flex',
-    alignItems: 'center',
     justifyContent: 'center',
-    flex: 0,
   },
-  listContainer: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
+  sliderContainer: {
+    position: 'absolute',
+    top: '17.5%',
+    gap: 10,
+    zIndex: 1,
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
     marginBottom: 16,
+    backgroundColor: 'white',
+    width: '85%',
+    borderRadius: 100,
+    height: 45,
   },
 });
 
