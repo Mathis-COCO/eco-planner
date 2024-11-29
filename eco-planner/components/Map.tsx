@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { StyleSheet, View, Text, Platform, Linking, Alert } from 'react-native';
 import MapView, { LongPressEvent, Marker } from 'react-native-maps';
 
-const Map: React.FC<MapProps> = ({ userCoords, stationsList, onCoordsChange, selectedStationCoords }) => {
+const Map: React.FC<MapProps> = ({ userCoords, stationsList, onCoordsChange, selectedStationCoords, chosenRange }) => {
     const [userMapCoords, setUserMapCoords] = useState<number[]>(userCoords);
     const mapRef = useRef<MapView | null>(null);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -55,31 +55,8 @@ const Map: React.FC<MapProps> = ({ userCoords, stationsList, onCoordsChange, sel
         }
     };
 
-    const handleOpenInOSMaps = () => {
-        const url = Platform.select({
-          ios: `maps:0,0?q=${selectedStationCoords[0]},${selectedStationCoords[1]}`,
-          android: `geo:0,0?q=${selectedStationCoords[0]},${selectedStationCoords[1]}`,
-        });
-    
-        if (url) {
-          Linking.canOpenURL(url)
-            .then((supported) => {
-              if (supported) {
-                return Linking.openURL(url);
-              } else {
-                Alert.alert("Erreur", "Impossible d'ouvrir l'application de cartes");
-              }
-            })
-            .catch((err) => {
-              console.error("Erreur lors de l'ouverture des cartes:", err);
-            });
-        } else {
-          Alert.alert("Erreur", "URL non valide");
-        }
-      };
-
     return (
-        <View style={styles.container}>
+      <View style={styles.container}>
         <MapView
             ref={mapRef}
             onLongPress={handleLongPress}
@@ -120,7 +97,7 @@ const Map: React.FC<MapProps> = ({ userCoords, stationsList, onCoordsChange, sel
             </Marker>
             ))}
         </MapView>
-        </View>
+      </View>
     );
 };
 

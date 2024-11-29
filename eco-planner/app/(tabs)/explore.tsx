@@ -6,12 +6,17 @@ import StationInfos from '@/components/StationInfos';
 import useLocation from '@/hooks/useLocation';
 import useGasStations from '@/hooks/useGasStations';
 import Entypo from '@expo/vector-icons/Entypo';
+import { Icon, Slider } from '@rneui/base';
+import SliderComponent from '@/components/RangeSlider';
 
 const GasStationsScreen: React.FC = () => {
   const { coords: userCoords, fetchLocation } = useLocation();
   const { filteredStations, fetchGasPrices, selectedFuelType, setSelectedFuelType } = useGasStations(userCoords);
   const [selectedCoords, setSelectedCoords] = useState<number[]>([]);
-  const [listHeight, setListHeight] = useState<number>(100);
+  const [listHeight, setListHeight] = useState<number>(0);
+  const [chosenRange, setChosenRange] = useState(50);
+  const [maxDistance, setMaxDistance] = useState(50);
+  const [minDistance, setMinDistance] = useState(0);
 
   useEffect(() => {
     fetchLocation();
@@ -22,6 +27,14 @@ const GasStationsScreen: React.FC = () => {
       setSelectedCoords(userCoords);
     }
   }, [userCoords]);
+
+  useEffect(() => {
+    if (filteredStations.length > 0 && filteredStations[filteredStations.length - 1].distance) {
+      setChosenRange(Math.ceil(parseFloat(filteredStations[filteredStations.length - 1].distance.replace(' km', '')))*10)
+      filteredStations[filteredStations.length - 1].distance.includes(' km') ? setMaxDistance(parseFloat(filteredStations[filteredStations.length - 1].distance.replace(' km', '')) * 10) : setMaxDistance(parseFloat(filteredStations[filteredStations.length - 1].distance.replace(' m', '')) / 100) 
+      filteredStations[0].distance.includes(' km') ? setMinDistance(parseFloat(filteredStations[0].distance.replace(' km', '')) * 10) : setMinDistance(parseFloat(filteredStations[0].distance.replace(' m', '')) / 100)
+    }
+  }, [filteredStations]);
 
   const handleFuelTypeChange = (fuelType: string) => {
     setSelectedFuelType(fuelType);
@@ -36,46 +49,63 @@ const GasStationsScreen: React.FC = () => {
   };
 
   const toggleListHeight = () => {
-    setListHeight(prevHeight => (prevHeight === 100 ? 0 : 100));
+    setListHeight(prevHeight => (prevHeight === 100 ? 0 : prevHeight === 0 ? -1 : 100));
   };
 
+  console.log(chosenRange)
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Stations-Service</Text>
-      {userCoords && (
-        <Button title="Rechercher les stations autour de moi" onPress={() => fetchGasPrices(selectedCoords)} />
-      )}
+<SafeAreaView style={styles.container}>
+  {userCoords && (
+    <Button title="Rechercher les stations autour de moi" onPress={() => fetchGasPrices(selectedCoords)} />
+  )}
 
-      <FuelFilters onFuelTypeChange={handleFuelTypeChange} />
-      {userCoords && (
-        <MapScreen
-          userCoords={userCoords}
-          stationsList={filteredStations}
-          onCoordsChange={handleUserPositionChange}
-          selectedStationCoords={selectedCoords}
+  <FuelFilters onFuelTypeChange={handleFuelTypeChange} />
+  
+  {filteredStations.length > 0 && (
+    <SliderComponent
+      value={chosenRange}
+      onValueChange={setChosenRange}
+      maximumValue={Math.ceil(maxDistance)}
+      minimumValue={Math.floor(minDistance)}
+    />
+  )}
+  
+  {userCoords && (
+    <MapScreen
+      userCoords={userCoords}
+      stationsList={filteredStations}
+      onCoordsChange={handleUserPositionChange}
+      selectedStationCoords={selectedCoords}
+    />
+  )}
+
+  {filteredStations.length > 0 && (
+    <>
+      <Pressable onPress={toggleListHeight} style={styles.swapHeigth}>
+        <Entypo name="dots-three-horizontal" size={24} color="black" />
+      </Pressable>
+      {listHeight !== -1 && (
+        <FlatList
+          style={[styles.listContainer, { height: `${listHeight}%` }]}
+          data={filteredStations}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => {
+            if (+item.distance.replace(' km', '') * 10 < chosenRange) {
+              return (
+                <StationInfos
+                  station={item}
+                  selectedFuelType={selectedFuelType}
+                  onPress={() => handleStationSelect([+item.latitude, +item.longitude])}
+                />
+              );
+            }
+            return null;
+          }}
         />
       )}
-
-      {filteredStations.length > 0 && (
-        <>
-          <Pressable onPress={toggleListHeight} style={styles.swapHeigth}>
-            <Entypo name="dots-three-horizontal" size={24} color="black" />
-          </Pressable>
-          <FlatList
-            style={[styles.listContainer, { height: `${listHeight}%` }]}
-            data={filteredStations}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <StationInfos
-                station={item}
-                selectedFuelType={selectedFuelType}
-                onPress={() => handleStationSelect([+item.latitude, +item.longitude])}
-              />
-            )}
-          />
-        </>
-      )}
-    </SafeAreaView>
+    </>
+  )}
+</SafeAreaView>
   );
 };
 
@@ -84,6 +114,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     backgroundColor: '#fff',
+    marginBottom: '21%',
   },
   title: {
     fontSize: 24,

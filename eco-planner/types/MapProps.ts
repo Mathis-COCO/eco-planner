@@ -4,4 +4,5 @@ interface MapProps {
     stationsList: Station[];
     onCoordsChange: (userMapCoords: number[]) => void;
     selectedStationCoords: number[];
+    chosenRange: number;
   }

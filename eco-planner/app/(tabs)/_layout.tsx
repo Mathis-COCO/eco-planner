@@ -8,6 +8,8 @@ import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
+import { SafeAreaView, StyleSheet } from 'react-native';
+
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
@@ -39,6 +41,16 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="map.fill" color={color} />,
         }}
       />
+      {/* SafeAreaView pour gérer l'interface en toute sécurité */}
+      <SafeAreaView style={styles.container}>
+        {/* Votre contenu ici */}
+      </SafeAreaView>
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});
