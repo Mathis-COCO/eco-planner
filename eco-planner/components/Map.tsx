@@ -103,7 +103,7 @@ const Map: React.FC<MapProps> = ({ userCoords, stationsList, onCoordsChange, sel
                 radius = { chosenRange }
                 strokeWidth = { 1 }
                 strokeColor = { '#1a66ff' }
-                fillColor = { 'rgba(230,238,255,0.5)' }
+                fillColor = { 'rgba(255,255,255,0.25)' }
             />
         </MapView>
       </View>
