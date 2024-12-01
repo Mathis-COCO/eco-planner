@@ -11,10 +11,6 @@ export default function HomeScreen() {
   const [inputText, setInputText] = useState('');
   const { data, loading, error } = useCars(inputText);
 
-  useEffect(() => {
-    console.log(data);
-  }, [data]);
-
   const handleTextChange = (text: string) => {
     setInputText(text);
   };

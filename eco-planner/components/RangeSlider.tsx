@@ -2,19 +2,7 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 import { Icon, Slider } from '@rneui/base';
 
-interface SliderComponentProps {
-  value: number;
-  onValueChange: (value: number) => void;
-  maximumValue: number;
-  minimumValue: number;
-}
-
-const SliderComponent: React.FC<SliderComponentProps> = ({
-  value,
-  onValueChange,
-  maximumValue,
-  minimumValue,
-}) => {
+const SliderComponent: React.FC<SliderComponentProps> = ({ value, onValueChange, maximumValue, minimumValue}) => {
   return (
     <Slider
       value={value}

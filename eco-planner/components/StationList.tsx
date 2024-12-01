@@ -3,23 +3,7 @@ import { StyleSheet, FlatList, Pressable, View } from 'react-native';
 import Entypo from '@expo/vector-icons/Entypo';
 import StationInfos from '@/components/StationInfos';
 
-interface StationsListProps {
-  filteredStations: any[];
-  selectedFuelType: string;
-  chosenRange: number;
-  listHeight: number;
-  toggleListHeight: () => void;
-  onStationSelect: (stationCoords: number[]) => void;
-}
-
-const StationsList: React.FC<StationsListProps> = ({
-  filteredStations,
-  selectedFuelType,
-  chosenRange,
-  listHeight,
-  toggleListHeight,
-  onStationSelect,
-}) => {
+const StationsList: React.FC<StationsListProps> = ({ filteredStations, selectedFuelType, chosenRange, listHeight, toggleListHeight, onStationSelect}) => {
   return (
     <>
       <Pressable onPress={toggleListHeight} style={styles.swapHeigth}>

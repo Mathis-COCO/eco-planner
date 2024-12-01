@@ -3,11 +3,6 @@ import { TouchableOpacity } from 'react-native';
 import { StyleSheet, View } from 'react-native';
 import { Text } from 'react-native';
 
-interface TempProps {
-    station: Station;
-    selectedFuelType: string;
-    onPress: () => void;
-}
 const StationInfos: React.FC<TempProps> = ({ station, selectedFuelType, onPress }) => {
     return (
         <TouchableOpacity onPress={onPress}>
